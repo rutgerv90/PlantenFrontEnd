@@ -6,8 +6,6 @@
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
 
-
-<link rel="import" href="scripts/config.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-view1">
@@ -68,7 +66,7 @@
       <template>[[item.leverdat]]</template>
     </brainy-table-column>
     <brainy-table-column name="Bedrag" sort-by="bedrag">
-      <template>€[[item.bedrag]]</template>
+      <template>[[item.bedrag]]</template>
     </brainy-table-column>
     <brainy-table-column name="Status" sort-by="status">
       <template>[[item.status]]</template>
@@ -93,8 +91,7 @@
     </brainy-table-column>    
     
     <template is="row-detail">
-    
-    <iron-ajax 
+        <iron-ajax 
             auto  
             url="[[apiURL]]/api/bestelregels/findonId/[[item.id]]"
             handle-as="json"
@@ -113,7 +110,6 @@
             </data-table-column>
           </iron-data-table>
        
-        
     </template>
     
   </brainy-table>
@@ -134,11 +130,10 @@
             },
         handleBestelling: function(data) {
             var temp = data.detail.response;
-            console.log(temp);
-            for(item in temp){
-//                item.bedrag.toFixed(2);
+            for(var i=0;i<temp.length;i++) {
+                temp[i].bedrag = (temp[i].bedrag != null ? config._formatMoney(temp[i].bedrag,'€') : '€ ?');
             }
-            this.besteldata = data.detail.response;
+            this.besteldata = temp;
         },
         test: function(data) {
             console.log(data.detail.response);

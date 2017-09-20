@@ -15,8 +15,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/paper-styles/shadow.html">
 <link rel="import" href="../bower_components/poly-filter/poly-filter.html">
-<link rel="import" href="../bower_components/iron-overlay-behavior/iron-overlay-behavior.html">
-<link rel="import" href="../bower_components/iron-overlay-behavior/iron-overlay-backdrop.html">
+<link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../bower_components/brainy-table/brainy-table.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 
   <link rel="import" href="elements/plant-info/plant-info.html">
 
@@ -47,11 +48,71 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           font-weight: 400;
           margin: 10px 20px;
         }
+        .ib {
+            display: inline;
+        }
 
         .item {
           list-style: none;
-/*          background-color: white;*/
-            background-image: url(../images/planten/default.JPG);
+            position: relative;
+            background-color: white;
+            overflow: hidden;
+/*
+            background-image: url(../images/planticon.png);
+            background-size: cover;
+            background-position: center center;
+            opacity: 0.75;
+*/
+        }
+        .item img {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: auto;
+            opacity: 0.6;
+        }
+        .item-title {
+            position: absolute;
+            bottom: 20px;
+            display: inline-block;
+            width: 100%;
+            text-align: left;
+            padding-left: 10px;
+            margin: 0px;
+            font-size: 18px;
+        }
+        .item-voorraad {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            padding: 0px 5px;
+/*            border: 2px solid green;*/
+            border-radius: 5px;
+            padding: auto 5px;
+            background-color: lightgreen;
+            opacity: 0.75;
+        }
+        .item-voorraad h2 {
+            margin: 0px;
+        }
+        .item-prijs {
+            position: absolute;
+            background-color: limegreen;
+            color: white;
+            top: 10px;
+            left:-40px;
+            width: 150px;
+            text-align: center;
+            transform: rotate(315deg) ;
+            -webkit-transform: rotate(315deg) ;
+            -moz-transform: rotate(315deg) ;
+            -o-transform: rotate(315deg) ;
+            -ms-transform: rotate(315deg) ;
+        }
+        .item-prijs h2 {
+            margin: 0px;
+            font-size: 18px;
         }
 
         @media (min-width: 800px) {
@@ -72,15 +133,42 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         }
         
+        #plantDialog {
+            width: 500px;
+            height: 400px;
+            position: relative;
+        }
+        paper-dialog {
+            border-radius: 10px;
+        }
+        
       </style>
        
-       <template is="dom-if" if="{{!_plantView()}}">
-       
+       <paper-dialog id="dialog" opened="{{dialogOpened}}">
+            <div id="plantDialog">
+            <h2>Naam: [[selectedItem.plantennaam]]</h2>
+<!--            <img src$="[[selectedItem.originalUrl]]" alt="[[selectedItem.title]]">-->
+            <p>Id: [[selectedItem.id]]</p>
+            <p>Soort: [[selectedItem.soort]]</p>
+            <p>Kleur: [[selectedItem.kleur]]</p>
+            <p>Prijs: [[selectedItem.hoogte]]</p>
+            <p>Bloei begin: [[selectedItem.bloeibeg]]</p>
+            <p>Bloei eind: [[selectedItem.bloeieind]]</p>
+            <p>Prijs: [[selectedItem.prijs]]</p>
+            <p>Voorraad: [[selectedItem.vrr_aantal]]</p>
+        </div>
+        </paper-dialog>
+        
+           <div class="plant-control">Grid <paper-toggle-button checked="{{!showList}}" class="ib"></paper-toggle-button> List</div>     
+           
+             <span>Filter planten:
+          <input type="string" value="{{filterString::input}}" autofocus> Displaying {{filteredPlantData.length}} results out of {{plantdata.length}}
+        </span>  
         
         <!-- FETCH ITEMS -->
         <iron-ajax 
             auto
-            url="http://localhost:8082/api/planten"
+            url="[[apiURL]]/api/planten"
             handle-as="json"
             on-response="handlePlanten" 
             debounce-duration="400"></iron-ajax>
@@ -90,30 +178,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           filter="[[filterString]]"
           filtered-array="{{filteredPlantData}}">
         </poly-filter>
+       
+       <template is="dom-if" if="[[showList]]">        
         
-        {{route}}
-        
-        <span>Filter planten:
-          <input type="string" value="{{filterString::input}}" autofocus>
-        </span>
         
     <ul class="app-grid">
         <template is="dom-repeat" items="[[filteredPlantData]]" sort="_sort">
-          <li class="item">
-          <h1>[[item.plantennaam]]</h1>
-          
-          <!-- FETCH ITEMS -->
-<!--
-        <iron-ajax 
-            auto
-            url="https://pixabay.com/api/"                
-            params='{"q":"[[item.plantennaam]]", "key": "6487083-266051b7c196ccd9138dd7a80", "image_type": "photo", "lang":"nl", "safesearch":"true","page":"1","per_page":"3"}'            
-            handle-as="json"
-            last-response="{{plantImg}}"            
-            debounce-duration="400"></iron-ajax>
-            
-            <img src="{{plantImg.hits[0].previewURL}}"/>
--->
+          <li class="item" on-tap="handleItemTap">
+             <div class="list-img"></div>
+<!--            <div class="item-voorraad"><h2>[[item.vrr_aantal]]</h2></div>-->
+             <div class="item-prijs"><h2>[[item.prijs]]</h2></div>
+              <h2 class="item-title">[[item.plantennaam]]</h2>
+              <img src="../images/planticon.png" alt="">
             
           </li>
           
@@ -121,47 +197,42 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </ul>
       
       </template>
-         
         
-        <template is="dom-if" if="{{_plantView()}}">
-        <style>
-            h1 {
-                font-family: ub
-            }
-        </style>
+        <template is="dom-if" if="[[!showList]]">
+            <div class="card">
         
-        <!-- FETCH ITEMS -->
-        <iron-ajax 
-            auto
-            url="http://localhost:8082/api/planten/[[plantId]]"
-            handle-as="json"
-            last-response="{{plant}}"
-            on-error="_plantError"                        
-            debounce-duration="400"></iron-ajax>
-        
-        
+                <brainy-table items="[[filteredPlantData]]" page-size="25" default-sort-path="id" default-sort-direction="asc" no-custom-scroll no-scroll-shadows>
+                    <brainy-table-column name="ID" sort-by="id" width="10px">
+                      <template>[[item.id]]</template>
+                    </brainy-table-column>
+                     <brainy-table-column name="Naam" sort-by="plantennaam">
+                      <template>[[item.plantennaam]]</template>
+                    </brainy-table-column>
+                     <brainy-table-column name="Soort" sort-by="soort">
+                      <template>[[item.soort]]</template>
+                    </brainy-table-column>
+                     <brainy-table-column name="Kleur" sort-by="kleur">
+                      <template>[[item.kleur]]</template>
+                    </brainy-table-column>
+                     <brainy-table-column name="Hoogte" sort-by="hoogte">
+                      <template>[[item.hoogte]]</template>
+                    </brainy-table-column>
+                     <brainy-table-column name="Bloei Begin" sort-by="bloeibeg">
+                      <template>[[item.bloeibeg]]</template>
+                    </brainy-table-column>
+                     <brainy-table-column name="Bloei Eind" sort-by="bloeieind">
+                      <template>[[item.bloeieind]]</template>
+                    </brainy-table-column>
+                     <brainy-table-column name="Prijs">
+                      <template>[[item.prijs]]</template>
+                    </brainy-table-column>
+                     <brainy-table-column name="Voorraad" sort-by="vrr_aantal">
+                      <template>[[item.vrr_aantal]]</template>
+                    </brainy-table-column>
+                </brainy-table>
+            </div>
             
-        <div class="card">
-             <template is="dom-if" if="{{plant}}">    
-              <ul>
-                  <li>[[plant.plantennaam]]</li>
-                  <li>[[plant.soort]]</li>
-                  <li>[[plant.kleur]]</li>
-                  <li>[[plant.prijs]]</li>
-                  <li>[[plant.hoogte]]</li>
-                  <li>[[plant.id]]</li>
-              </ul>
-            </template>
-            <template is="dom-if" if="{{!plant}}">    
-                <h2>Geen plant gevonden</h2>
-            </template>
-        </div>
-        
-        
-        
-                          
-      </template>
-    
+        </template>   
     
   </template>
 
@@ -178,24 +249,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 _showPlant: {
                     type: Boolean,
                     value: false
-                }
+                },
+                apiURL: {
+                    value: config.url
+                },
+                selectedItem: Object,
+                dialogOpened: {
+                    type: Boolean,
+                    value: false
+                },
             },
-        /*attached: function() {
-            this._updateGridStyles = this._updateGridStyles || function() {
-              this.updateStyles();
-            }.bind(this);
-            window.addEventListener('resize', this._updateGridStyles);
-          },
-
-          detached: function() {
-            window.removeEventListener('resize', this._updateGridStyles);
-          },*/
         handlePlanten: function(data) {
-            this.plantdata =data.detail.response
-//            var temp = data.detail.response;
-//            temp.forEach(function (value) {
-//              
-//            });
+            var temp = data.detail.response;
+            for(var i=0;i<temp.length;i++) {
+                temp[i].prijs = (temp[i].prijs != null ? config._formatMoney(temp[i].prijs,'€') : '€ ?');
+            }
+            this.plantdata=temp;
         },
         _sort: function(a, b) {
           var titleA = a.plantennaam.toLowerCase(), titleB = b.plantennaam.toLowerCase();
@@ -216,6 +285,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         _plantError: function(data) {
             this._showPlant = false;
+        },
+        handleItemTap: function(e,f) {
+            this.set('selectedItem', e.model.item);
+//            var body = document.querySelector('body');
+//            Polymer.dom(body).appendChild(this.$.dialog);
+            let dialog = this.$.dialog;
+            dialog.opened = true;
         },
         attributeChanged: function(name, type) {
 //            console.log(this.localName + ' attribute ' + name + ' was changed to ' + this.getAttribute(name));
