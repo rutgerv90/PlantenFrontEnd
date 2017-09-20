@@ -15,13 +15,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/paper-styles/shadow.html">
 <link rel="import" href="../bower_components/poly-filter/poly-filter.html">
+<link rel="import" href="../bower_components/iron-overlay-behavior/iron-overlay-behavior.html">
+<link rel="import" href="../bower_components/iron-overlay-behavior/iron-overlay-backdrop.html">
+
+  <link rel="import" href="elements/plant-info/plant-info.html">
 
 
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-view3">
-  <template>
-   
+  <template>   
     <style include="shared-styles app-grid-style">
       :host {
           padding: 10px;
@@ -68,7 +71,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             @apply --app-grid-expandible-item;
           }
         }
+        
       </style>
+       
+       <template is="dom-if" if="{{!_plantView()}}">
+       
         
         <!-- FETCH ITEMS -->
         <iron-ajax 
@@ -83,7 +90,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           filter="[[filterString]]"
           filtered-array="{{filteredPlantData}}">
         </poly-filter>
-
+        
+        {{route}}
         
         <span>Filter planten:
           <input type="string" value="{{filterString::input}}" autofocus>
@@ -111,26 +119,50 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           
         </template>
       </ul>
-       
-        <!--<div class="centered-container">
-          <ul class="app-grid">
-            <template is="dom-repeat" items="[[plantdata]]">
-              <li class="item">
-                <div class="item-title">[[item.plantennaam]]</div>
-              </li>
+      
+      </template>
+         
+        
+        <template is="dom-if" if="{{_plantView()}}">
+        <style>
+            h1 {
+                font-family: ub
+            }
+        </style>
+        
+        <!-- FETCH ITEMS -->
+        <iron-ajax 
+            auto
+            url="http://localhost:8082/api/planten/[[plantId]]"
+            handle-as="json"
+            last-response="{{plant}}"
+            on-error="_plantError"                        
+            debounce-duration="400"></iron-ajax>
+        
+        
+            
+        <div class="card">
+             <template is="dom-if" if="{{plant}}">    
+              <ul>
+                  <li>[[plant.plantennaam]]</li>
+                  <li>[[plant.soort]]</li>
+                  <li>[[plant.kleur]]</li>
+                  <li>[[plant.prijs]]</li>
+                  <li>[[plant.hoogte]]</li>
+                  <li>[[plant.id]]</li>
+              </ul>
             </template>
-          </ul>
-        </div>-->
-
+            <template is="dom-if" if="{{!plant}}">    
+                <h2>Geen plant gevonden</h2>
+            </template>
+        </div>
         
         
-
-    <!--<div class="card">
-      <div class="circle">3</div>
-      <h1>View Three</h1>
-      <p>Modus commodo minimum eum te, vero utinam assueverit per eu.</p>
-      <p>Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe pertinax ei, ad pri animal labores suscipiantur.</p>
-    </div>-->
+        
+                          
+      </template>
+    
+    
   </template>
 
   <script>
@@ -139,6 +171,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         properties: {                
                 plantdata: {
                     type: Array
+                },
+                plantId: {
+                    value: null,
+                },
+                _showPlant: {
+                    type: Boolean,
+                    value: false
                 }
             },
         /*attached: function() {
@@ -163,7 +202,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (titleA < titleB)  return -1;
             if (titleA > titleB) return 1;
             return 0;
-        }
+        },
+        ready: function() {
+//            console.log('test');
+        },
+        _plantView: function() {
+            this.plantId = this.subroute.path.replace('/','');
+            if(this.plantId) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        _plantError: function(data) {
+            this._showPlant = false;
+        },
+        attributeChanged: function(name, type) {
+//            console.log(this.localName + ' attribute ' + name + ' was changed to ' + this.getAttribute(name));
+            console.log(name, type);
+        },
     });
   </script>
 </dom-module>
