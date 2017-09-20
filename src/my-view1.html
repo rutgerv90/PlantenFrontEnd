@@ -1,0 +1,71 @@
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/brainy-table/brainy-table.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="my-view1">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+    </style>
+    
+    <!-- FETCH ITEMS -->
+        <iron-ajax 
+            auto
+            url="http://localhost:8082/api/bestelling"
+            handle-as="json"
+            on-response="handleBestelling"
+            debounce-duration="400"></iron-ajax>
+
+    <div class="card">
+    <!--<template is="dom-repeat" items="{{data}}">
+            <div><span>{{item.besteldat}}</span></div>
+            <div>Last name: <span>{{item.leverdat}}</span></div>
+        </template>-->
+        
+        <brainy-table items="[[besteldata]]" page-size="100" default-sort-path="id" default-sort-direction="asc">
+    <brainy-table-column name="ID" sort-by="id">
+      <template>[[item.id]]</template>
+    </brainy-table-column>
+    <brainy-table-column name="Bestel Datum">
+      <template>[[item.besteldat]]</template>
+    </brainy-table-column>
+    <brainy-table-column name="Lever Datum">
+      <template>[[item.leverdat]]</template>
+    </brainy-table-column>
+    <brainy-table-column name="Bedrag" sort-by="bedrag">
+      <template>€[[item.bedrag]]</template>
+    </brainy-table-column>
+    <brainy-table-column name="Status" sort-by="status">
+      <template>[[item.status]]</template>
+    </brainy-table-column>
+    <brainy-table-column name="Lever Code" sort-by="levcode">
+      <template>[[item.levcode]]</template>
+    </brainy-table-column>
+  </brainy-table>
+    
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'my-view1',
+        properties: {                
+                besteldata: {
+                    type: Array
+                }
+            },
+        handleBestelling: function(data) {
+            var temp = data.detail.response;
+            for(item in temp){
+//                item.bedrag.toFixed(2);
+            }
+            this.besteldata = data.detail.response;
+        }
+    });
+  </script>
+</dom-module>
