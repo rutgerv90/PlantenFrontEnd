@@ -1,6 +1,11 @@
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/brainy-table/brainy-table.html">
+<link rel="import" href="../bower_components/iron-data-table/iron-data-table.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
+
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-view1">
@@ -8,15 +13,38 @@
     <style include="shared-styles">
       :host {
         display: block;
-
         padding: 10px;
       }
-    </style>
+        .expandable brainy-tr[expanded] {
+      margin: 10px 0;
+
+      @apply(--shadow-elevation-3dp);
+    }
+    </style>    
+    
+    <!--<iron-ajax 
+            auto  
+            url="[[apiURL]]/api/bestelregels/findonId/175"
+            handle-as="json"
+            last-response="{{bestelregels}}"                     
+            debounce-duration="400"></iron-ajax>
+            
+            <iron-data-table items="[[bestelregels]]" as="item2">
+            <data-table-column name="Plant">
+              <template>[[item.plant.plantennaam]]</template>
+            </data-table-column>
+            <data-table-column name="Aantal">
+              <template>[[item.aantal]]</template>
+            </data-table-column>
+            <data-table-column name="Prijs">
+              <template>[[item.bestelprijs]]</template>
+            </data-table-column>
+          </iron-data-table>-->
     
     <!-- FETCH ITEMS -->
         <iron-ajax 
             auto
-            url="http://localhost:8082/api/bestelling/all"
+            url="[[apiURL]]/api/bestelling/all"
             handle-as="json"
             on-response="handleBestelling"
             debounce-duration="400"></iron-ajax>
@@ -27,7 +55,7 @@
             <div>Last name: <span>{{item.leverdat}}</span></div>
         </template>-->
         
-        <brainy-table items="[[besteldata]]" page-size="100" default-sort-path="id" default-sort-direction="asc">
+        <brainy-table items="[[besteldata]]" class="expandable" page-size="100" default-sort-path="id" default-sort-direction="asc" details-enabled>
     <brainy-table-column name="ID" sort-by="id">
       <template>[[item.id]]</template>
     </brainy-table-column>
@@ -38,14 +66,52 @@
       <template>[[item.leverdat]]</template>
     </brainy-table-column>
     <brainy-table-column name="Bedrag" sort-by="bedrag">
-      <template>€[[item.bedrag]]</template>
+      <template>[[item.bedrag]]</template>
     </brainy-table-column>
     <brainy-table-column name="Status" sort-by="status">
       <template>[[item.status]]</template>
     </brainy-table-column>
-    <brainy-table-column name="Lever Code" sort-by="levcode">
-      <template>[[item.levcode]]</template>
+    <brainy-table-column name="Leverancier" sort-by="levnaam" filter-by="leverancier.levnaam">
+      <template>[[item.leverancier.levnaam]]</template>
     </brainy-table-column>
+    <brainy-table-column name="Toggle">
+        <template><paper-toggle-button id="toggle-[[item.id]]" on-change="toggleShow"></paper-toggle-button></template>
+    </brainy-table-column>
+    
+    
+    <brainy-table-column name width="20px" align-right flex="0">
+      <template>
+        <template is="dom-if" if="[[!expanded]]">
+          <iron-icon icon="icons:expand-more"></iron-icon>
+        </template>
+        <template is="dom-if" if="[[expanded]]">
+          <iron-icon icon="icons:expand-less"></iron-icon>
+        </template>
+      </template>
+    </brainy-table-column>    
+    
+    <template is="row-detail">
+        <iron-ajax 
+            auto  
+            url="[[apiURL]]/api/bestelregels/findonId/[[item.id]]"
+            handle-as="json"
+            last-response="{{bestelregels}}"                     
+            debounce-duration="400"></iron-ajax>
+            
+            <iron-data-table items="[[bestelregels]]" style="width:100%">
+            <data-table-column name="Plant">
+              <template>[[item.plant.plantennaam]]</template>
+            </data-table-column>
+            <data-table-column name="Aantal">
+              <template>[[item.aantal]]</template>
+            </data-table-column>
+            <data-table-column name="Prijs">
+              <template>[[item.bestelprijs]]</template>
+            </data-table-column>
+          </iron-data-table>
+       
+    </template>
+    
   </brainy-table>
     
     </div>
@@ -57,14 +123,20 @@
         properties: {                
                 besteldata: {
                     type: Array
+                },
+                apiURL: {
+                    value: config.url
                 }
             },
         handleBestelling: function(data) {
             var temp = data.detail.response;
-            for(item in temp){
-//                item.bedrag.toFixed(2);
+            for(var i=0;i<temp.length;i++) {
+                temp[i].bedrag = (temp[i].bedrag != null ? config._formatMoney(temp[i].bedrag,'€') : '€ ?');
             }
-            this.besteldata = data.detail.response;
+            this.besteldata = temp;
+        },
+        test: function(data) {
+            console.log(data.detail.response);
         }
     });
   </script>
