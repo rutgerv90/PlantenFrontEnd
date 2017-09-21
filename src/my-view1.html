@@ -5,6 +5,8 @@
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 
 <link rel="import" href="shared-styles.html">
 
@@ -20,26 +22,63 @@
 
       @apply(--shadow-elevation-3dp);
     }
+        
+         #statusToast {
+/*    --paper-toast-background-color: var(--statusColor);*/
+    --paper-toast-background-color: green;
+    --paper-toast-color: white;
+  }
+        brainy-tr-detail {
+            padding: 1px;
+        }
+        #grid1 data-table-row:not([header]) data-table-cell {
+      height: 60px;
+    }
+
+    #grid1 {
+      --default-primary-color: red;
+      font-family: 'Roboto', 'Noto', sans-serif;
+      --iron-data-table-header: {
+        background-color: #31a001; 
+          /*was #37474F*/
+        color: #fff;
+        font-size: 1.2em;
+        font-weight: 400;
+      }
+      --iron-data-table-row: {
+        height: 60px;
+        align-items: center;
+      }
+      --iron-data-table-row-odd: {
+        background-color: #fff;
+      }
+      --iron-data-table-row-even: {
+        background-color: #fafafa;
+      }
+      --iron-data-table-row-hover: {
+        background-color: #eee !important;
+      }
+      --iron-data-table-row-selected: {
+        background-color: var(--default-primary-color) !important;
+        color: #fff;
+      }
+      --iron-data-table-row-after: {
+        background-color: #fff;
+        bottom: 16px;
+        content: "";
+        height: 2px;
+        left: 13px;
+        pointer-events: none;
+        position: absolute;
+        right: 0px;
+        transition: all 1s ease-in-out;
+        -webkit-transform: scaleX(0.0);
+        transform: scaleX(0.0);
+        z-index: 1;
+      }
+    }
     </style>    
-    
-    <!--<iron-ajax 
-            auto  
-            url="[[apiURL]]/api/bestelregels/findonId/175"
-            handle-as="json"
-            last-response="{{bestelregels}}"                     
-            debounce-duration="400"></iron-ajax>
-            
-            <iron-data-table items="[[bestelregels]]" as="item2">
-            <data-table-column name="Plant">
-              <template>[[item.plant.plantennaam]]</template>
-            </data-table-column>
-            <data-table-column name="Aantal">
-              <template>[[item.aantal]]</template>
-            </data-table-column>
-            <data-table-column name="Prijs">
-              <template>[[item.bestelprijs]]</template>
-            </data-table-column>
-          </iron-data-table>-->
+   
     
     <!-- FETCH ITEMS -->
         <iron-ajax 
@@ -68,15 +107,21 @@
     <brainy-table-column name="Bedrag" sort-by="bedrag">
       <template>[[item.bedrag]]</template>
     </brainy-table-column>
-    <brainy-table-column name="Status" sort-by="status">
-      <template>[[item.status]]</template>
+    <brainy-table-column name="Afgeleverd" sort-by="status">
+<!--      <template>[[item.status]]</template>-->
+      <template>
+          <paper-checkbox checked="[[item.status]]" on-change="statusHandler"></paper-checkbox>
+      </template>
     </brainy-table-column>
     <brainy-table-column name="Leverancier" sort-by="levnaam" filter-by="leverancier.levnaam">
       <template>[[item.leverancier.levnaam]]</template>
     </brainy-table-column>
-    <brainy-table-column name="Toggle">
+<!--
+    <brainy-table-column name="Completed">
+        
         <template><paper-toggle-button id="toggle-[[item.id]]" on-change="toggleShow"></paper-toggle-button></template>
     </brainy-table-column>
+-->
     
     
     <brainy-table-column name width="20px" align-right flex="0">
@@ -91,30 +136,42 @@
     </brainy-table-column>    
     
     <template is="row-detail">
-        <iron-ajax 
-            auto  
-            url="[[apiURL]]/api/bestelregels/findonId/[[item.id]]"
-            handle-as="json"
-            last-response="{{bestelregels}}"                     
-            debounce-duration="400"></iron-ajax>
-            
-            <iron-data-table items="[[bestelregels]]" style="width:100%">
-            <data-table-column name="Plant">
-              <template>[[item.plant.plantennaam]]</template>
-            </data-table-column>
-            <data-table-column name="Aantal">
-              <template>[[item.aantal]]</template>
-            </data-table-column>
-            <data-table-column name="Prijs">
-              <template>[[item.bestelprijs]]</template>
-            </data-table-column>
-          </iron-data-table>
+        <div style="width: 100%">
+            <iron-data-table items="[[item.bestelregels]]" id="grid1">
+                <!--<data-table-column name="Picture" width="50px" flex="0">
+                  <template>
+                    <img src="[[item.user.picture.thumbnail]]">
+                  </template>
+                </data-table-column>-->
+                <data-table-column name="" width="50px" flex="0">
+                  <template>
+                    <img src="../images/planticon.png" width="40px" height="40px">
+                  </template>
+                </data-table-column>
+                <data-table-column name="Artikel">
+                  <template>[[item.plant.plantennaam]]</template>
+                </data-table-column>
+                <data-table-column name="Aantal">
+                  <template>[[item.aantal]]</template>
+                </data-table-column>
+                <data-table-column name="Prijs">
+                  <template>[[item.bestelprijs]]</template>
+                </data-table-column>
+                <data-table-column name="Totaal">
+                  <template>[[item.totaal]]</template>
+                </data-table-column>
+            </iron-data-table>    
+        
+        </div>
        
     </template>
     
   </brainy-table>
     
     </div>
+    
+    <paper-toast id="statusToast" text="[[statusMsg]]"></paper-toast>
+    
   </template>
 
   <script>
@@ -126,14 +183,46 @@
                 },
                 apiURL: {
                     value: config.url
+                },
+                statusMsg: {
+                    type: String
+                },
+                statusColor: {
+                    type: String
                 }
             },
         handleBestelling: function(data) {
             var temp = data.detail.response;
             for(var i=0;i<temp.length;i++) {
                 temp[i].bedrag = (temp[i].bedrag != null ? config._formatMoney(temp[i].bedrag,'€') : '€ ?');
+                temp[i].status = (temp[i].status === 'C' ? false : true);
+                for(var j=0;j<temp[i].bestelregels.length;j++) {
+                    var bestelprijs = temp[i].bestelregels[j].bestelprijs;
+                    var totaal = bestelprijs * temp[i].bestelregels[j].aantal;
+                    temp[i].bestelregels[j].bestelprijs = (bestelprijs != null ? config._formatMoney(bestelprijs,'€') : '€ ?');
+                    temp[i].bestelregels[j].totaal = (totaal != null ? config._formatMoney(totaal,'€') : '€ ?');
+                }
             }
             this.besteldata = temp;
+        },
+        statusHandler: function(event) {
+            console.log(event.model.item);
+            var id = event.model.item.id;
+            var api_url = config.url +'/api/bestelling/changeTodeliverd/'+id;
+            fetch(api_url, {
+                method : "POST"
+            }).then( (response) => { 
+               //do something awesome that makes the world a better place                
+                if(response.status === 200) {
+                    this.set('statusMsg', "Update bestelling status succes!");
+                    this.set('statusColor', '#00ff00');
+                } else {
+                    this.set('statusMsg', "Update bestelling status failed!");
+                    this.set('statusColor', '#ff0000');                    
+                }
+                this.$.statusToast.horizontalAlign = "right";
+                this.$.statusToast.open();
+            });
         },
         test: function(data) {
             console.log(data.detail.response);
