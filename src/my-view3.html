@@ -119,6 +119,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             font-size: 18px;
         }
 
+        .plant-control {
+            font-family: 'Roboto', 'Noto', sans-serif;
+        }
+
         @media (min-width: 800px) {
           .item:nth-child(5n+1) {
             @apply --app-grid-expandible-item;
@@ -158,9 +162,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .closeButton {
               font-family: Arial, sans-serif;
               position: absolute;
-              top: -50px;
-              right: -20px;
-              opacity: 0.6;
+              top: -35px;
+              right: -10px;
+              color: limegreen;
               height: 40px;
               width: 40px;
               }
@@ -169,7 +173,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               font-family: 'Roboto', 'Noto', sans-serif;
               background-color: limegreen;
               color: white;
-              border-radius: 15px;
+              border-radius: 10px;
               text-align: center;
               font-size: 24px;
               line-height: 20px;
@@ -180,7 +184,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         p {
               font-family: 'Roboto', 'Noto', sans-serif;
               text-align-last: right;
-              font-size: 22px;
+              font-size: 20px;
               margin-top: 25px;
               }      
 
@@ -191,7 +195,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <div class="closeButton">
                   <paper-icon-button dialog-dismiss icon="icons:cancel"></paper-icon-button>
               </div>
-            <h2 class="title-item">Naam: [[selectedItem.plantennaam]]</h2>
+            <h2 class="title-item">[[selectedItem.plantennaam]]</h2>
             
             <img src="../images/planticon.png" item-height="100">
             <!--img src$="[[selectedItem.originalUrl]]" alt="[[selectedItem.title]]"-->
@@ -199,8 +203,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <p>Soort: [[selectedItem.soort]]</p>
             <p>Kleur: [[selectedItem.kleur]]</p>
             <p>Hoogte: [[selectedItem.hoogte]]</p>
-            <p>Bloei begin: [[selectedItem.bloeibeg]]</p>
-            <p>Bloei eind: [[selectedItem.bloeieind]]</p>
+            <p>Start Bloei: [[selectedItem.bloeibeg]]</p>
+            <p>Einde Bloei: [[selectedItem.bloeieind]]</p>
             <p>Prijs: [[selectedItem.prijs]]</p>
             <p>Voorraad: [[selectedItem.vrr_aantal]]</p>
         </div>
