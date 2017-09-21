@@ -104,7 +104,7 @@
     <brainy-table-column name="Lever Datum">
       <template>[[item.leverdat]]</template>
     </brainy-table-column>
-    <brainy-table-column name="Bedrag" sort-by="bedrag">
+    <brainy-table-column name="Bedrag" sort-by="sortBedrag">
       <template>[[item.bedrag]]</template>
     </brainy-table-column>
     <brainy-table-column name="Afgeleverd" sort-by="status">
@@ -138,26 +138,21 @@
     <template is="row-detail">
         <div style="width: 100%">
             <iron-data-table items="[[item.bestelregels]]" id="grid1">
-                <!--<data-table-column name="Picture" width="50px" flex="0">
-                  <template>
-                    <img src="[[item.user.picture.thumbnail]]">
-                  </template>
-                </data-table-column>-->
                 <data-table-column name="" width="50px" flex="0">
                   <template>
                     <img src="../images/planticon.png" width="40px" height="40px">
                   </template>
                 </data-table-column>
-                <data-table-column name="Artikel">
+                <data-table-column name="Artikel" sort-by="plant.plantennaam">
                   <template>[[item.plant.plantennaam]]</template>
                 </data-table-column>
-                <data-table-column name="Aantal">
+                <data-table-column name="Aantal" sort-by="aantal">
                   <template>[[item.aantal]]</template>
                 </data-table-column>
-                <data-table-column name="Prijs">
+                <data-table-column name="Prijs" sort-by="sortBestelprijs">
                   <template>[[item.bestelprijs]]</template>
                 </data-table-column>
-                <data-table-column name="Totaal">
+                <data-table-column name="Totaal" sort-by="sortTotaal">
                   <template>[[item.totaal]]</template>
                 </data-table-column>
             </iron-data-table>    
@@ -194,13 +189,17 @@
         handleBestelling: function(data) {
             var temp = data.detail.response;
             for(var i=0;i<temp.length;i++) {
-                temp[i].bedrag = (temp[i].bedrag != null ? config._formatMoney(temp[i].bedrag,'€') : '€ ?');
+                var bedrag = temp[i].bedrag;
+                temp[i].bedrag = (bedrag != null ? config._formatMoney(bedrag,'€') : '€ ?');
                 temp[i].status = (temp[i].status === 'C' ? false : true);
+                temp[i].sortBedrag = (parseInt(bedrag*100));
                 for(var j=0;j<temp[i].bestelregels.length;j++) {
                     var bestelprijs = temp[i].bestelregels[j].bestelprijs;
                     var totaal = bestelprijs * temp[i].bestelregels[j].aantal;
                     temp[i].bestelregels[j].bestelprijs = (bestelprijs != null ? config._formatMoney(bestelprijs,'€') : '€ ?');
                     temp[i].bestelregels[j].totaal = (totaal != null ? config._formatMoney(totaal,'€') : '€ ?');
+                    temp[i].bestelregels[j].sortBestelprijs = (parseInt(bestelprijs*100));
+                    temp[i].bestelregels[j].sortTotaal = (parseInt(totaal*100));
                 }
             }
             this.besteldata = temp;

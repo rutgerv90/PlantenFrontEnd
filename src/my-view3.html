@@ -144,8 +144,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         
       </style>
+      
        
        <paper-dialog id="dialog" opened="{{dialogOpened}}">
+          <iron-icon icon="icons:cancel"></iron-icon>
             <div id="plantDialog">
             <h2>Naam: [[selectedItem.plantennaam]]</h2>
 <!--            <img src$="[[selectedItem.originalUrl]]" alt="[[selectedItem.title]]">-->
@@ -224,7 +226,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                      <brainy-table-column name="Bloei Eind" sort-by="bloeieind">
                       <template>[[item.bloeieind]]</template>
                     </brainy-table-column>
-                     <brainy-table-column name="Prijs">
+                     <brainy-table-column name="Prijs" sort-by="sortPrijs">
                       <template>[[item.prijs]]</template>
                     </brainy-table-column>
                      <brainy-table-column name="Voorraad" sort-by="vrr_aantal">
@@ -263,7 +265,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         handlePlanten: function(data) {
             var temp = data.detail.response;
             for(var i=0;i<temp.length;i++) {
-                temp[i].prijs = (temp[i].prijs != null ? config._formatMoney(temp[i].prijs,'€') : '€ ?');
+                var prijs = temp[i].prijs;
+                temp[i].prijs = (prijs != null ? config._formatMoney(prijs,'€') : '€ ?');
+                temp[i].sortPrijs = (parseInt(prijs*100));
             }
             this.plantdata=temp;
         },
