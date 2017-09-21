@@ -18,6 +18,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../bower_components/brainy-table/brainy-table.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 
   <link rel="import" href="elements/plant-info/plant-info.html">
@@ -75,10 +76,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         .item-title {
             position: absolute;
-            bottom: 20px;
+            bottom: 0px;
+            background-color: limegreen;
+            color: white;
             display: inline-block;
             width: 100%;
-            text-align: left;
+            text-align: center;
             padding-left: 10px;
             margin: 0px;
             font-size: 18px;
@@ -102,6 +105,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             background-color: limegreen;
             color: white;
             top: 10px;
+            z-index: 10;
             left:-40px;
             width: 150px;
             text-align: center;
@@ -114,6 +118,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .item-prijs h2 {
             margin: 0px;
             font-size: 18px;
+        }
+
+        .plant-control {
+            font-family: 'Roboto', 'Noto', sans-serif;
         }
 
         @media (min-width: 800px) {
@@ -139,34 +147,85 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             height: 400px;
             position: relative;
         }
+
+        #plantDialog img {
+          position: absolute;
+            left: 35px;
+            top: 75px;
+            width: 60%;
+            height: auto;
+            opacity: 0.6;
+        }
         paper-dialog {
             border-radius: 10px;
         }
         
+        .closeButton {
+              font-family: Arial, sans-serif;
+              position: absolute;
+              top: -45px;
+              right: -10px;
+              color: limegreen;
+              height: 40px;
+              width: 40px;
+        }
+
+        .title-item {
+              font-family: 'Roboto', 'Noto', sans-serif;
+              background-color: limegreen;
+              color: white;
+              border-radius: 10px;
+              text-align: center;
+              font-size: 24px;
+              line-height: 20px;
+              font-weight: 400;
+              padding: 5px;
+              }       
+
+        p {
+              font-family: 'Roboto', 'Noto', sans-serif;
+              text-align-last: right;
+              font-size: 20px;
+              margin-top: 25px;
+              }    
+        
+        paper-icon-button {
+            --paper-icon-button: {
+                width: 55px;
+                height: 55px;
+              }
+        }
+
       </style>
       
        
        <paper-dialog id="dialog" opened="{{dialogOpened}}">
-          <iron-icon icon="icons:cancel"></iron-icon>
             <div id="plantDialog">
-            <h2>Naam: [[selectedItem.plantennaam]]</h2>
-<!--            <img src$="[[selectedItem.originalUrl]]" alt="[[selectedItem.title]]">-->
-            <p>Id: [[selectedItem.id]]</p>
-            <p>Soort: [[selectedItem.soort]]</p>
-            <p>Kleur: [[selectedItem.kleur]]</p>
-            <p>Hoogte: [[selectedItem.hoogte]]</p>
-            <p>Bloei begin: [[selectedItem.bloeibeg]]</p>
-            <p>Bloei eind: [[selectedItem.bloeieind]]</p>
-            <p>Prijs: [[selectedItem.prijs]]</p>
-            <p>Voorraad: [[selectedItem.vrr_aantal]]</p>
+              <div class="closeButton">
+                  <paper-icon-button dialog-dismiss icon="icons:cancel"></paper-icon-button>
+              </div>
+            <h2 class="title-item">[[selectedItem.plantennaam]]</h2>
+            
+            <img src="../images/planticon.png" item-height="100">
+            <!--img src$="[[selectedItem.originalUrl]]" alt="[[selectedItem.title]]"-->
+            <p>Id: <b>[[selectedItem.id]]</b></p>
+            <p>Soort: <b>[[selectedItem.soort]]</b></p>
+            <p>Kleur: <b>[[selectedItem.kleur]]</b></p>
+            <p>Hoogte: <b>[[selectedItem.hoogte]]</b></p>
+            <p>Start Bloei: <b>[[selectedItem.bloeibeg]]</b></p>
+            <p>Einde Bloei: <b>[[selectedItem.bloeieind]]</b></p>
+            <p>Prijs: <b>[[selectedItem.prijs]]</b></p>
+            <p>Voorraad: <b>[[selectedItem.vrr_aantal]]</b></p>
         </div>
         </paper-dialog>
         
-           <div class="plant-control">Grid <paper-toggle-button checked="{{!showList}}" class="ib"></paper-toggle-button> List</div>     
+           <div class="plant-control" style="float:right;margin-right: 10px;">Grid <paper-toggle-button checked="{{!showList}}" class="ib"></paper-toggle-button> List</div>     
            
-             <span>Filter planten:
+             <span style="float:left;margin-left: 10px;">Filter planten:
           <input type="string" value="{{filterString::input}}" autofocus> Displaying {{filteredPlantData.length}} results out of {{plantdata.length}}
-        </span>  
+        </span>
+        
+        <div style="clear:both"></div>  
         
         <!-- FETCH ITEMS -->
         <iron-ajax 
@@ -183,7 +242,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </poly-filter>
        
        <template is="dom-if" if="[[showList]]">        
-        
         
     <ul class="app-grid">
         <template is="dom-repeat" items="[[filteredPlantData]]" sort="_sort">
@@ -217,7 +275,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                      <brainy-table-column name="Kleur" sort-by="kleur">
                       <template>[[item.kleur]]</template>
                     </brainy-table-column>
-                     <brainy-table-column name="Hoogte" sort-by="hoogte">
+                     <brainy-table-column name="Hoogte (cm)" sort-by="hoogte">
                       <template>[[item.hoogte]]</template>
                     </brainy-table-column>
                      <brainy-table-column name="Bloei Begin" sort-by="bloeibeg">
@@ -268,6 +326,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 var prijs = temp[i].prijs;
                 temp[i].prijs = (prijs != null ? config._formatMoney(prijs,'€') : '€ ?');
                 temp[i].sortPrijs = (parseInt(prijs*100));
+                temp[i].kleur = temp[i].kleur.toLowerCase();
+                temp[i].soort = temp[i].soort.toLowerCase();
             }
             this.plantdata=temp;
         },
